@@ -11,7 +11,7 @@ network_hashrate = 133731.55
 # the proportion of hashrate already owned by the mining pool
 haved_hashrate_perchent = 0.1780
 
-# the rented hashrate (percentage of the entire network)
+# the rented hashrate (percentage of the entire network) to reach the 0.27 power
 hashrate_rent_percent = 0.0920
 
 # the rented hashrate (PH/s)
