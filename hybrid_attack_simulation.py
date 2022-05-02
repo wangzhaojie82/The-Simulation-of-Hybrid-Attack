@@ -5,7 +5,7 @@ import random
 import time
 import sys
 
-class Selfish_Mining:
+class Hybrid_Selfish_Mining:
 
     def __init__(self, **d):
         self.__nb_simulations = d['nb_simulations']
@@ -27,6 +27,7 @@ class Selfish_Mining:
         self.__orphanBlocks = 0
         self.__totalMinedBlocks = 0 # total valid blocks mined in current round simulation
 
+
     def write_file(self):
 
         stats_result = [self.__revenue]
@@ -35,10 +36,9 @@ class Selfish_Mining:
             f.write(','.join([str(x) for x in stats_result]) + '\n')
 
 
-
     def Simulate(self):
         '''
-        to implement one round simulation
+        to implement simulation
         '''
         while(self.__counter <= self.__nb_simulations):
             # Monte Carlo Sample
@@ -55,7 +55,7 @@ class Selfish_Mining:
 
             self.__counter += 1
 
-        # Publishing private chain if not empty when total nb of simulations reached
+        # Publishing private chain if not empty when total number of simulation rounds reached
         self.__delta = self.__privateChain - self.__publicChain
         if self.__delta > 0:
             self.__selfishValidBlocks += self.__privateChain
@@ -65,12 +65,14 @@ class Selfish_Mining:
         self.actualize_results()
         print(self)
 
+
     def On_Selfish_Miners(self):
         self.__privateChain += 1
         if self.__delta == 0 and self.__privateChain == 2:
             self.__privateChain, self.__publicChain = 0,0
             self.__selfishValidBlocks += 2
             # Publishing private chain reset both public and private chains lengths to 0
+
 
     def On_Honest_Miners(self):
         self.__publicChain += 1
@@ -98,6 +100,7 @@ class Selfish_Mining:
             if rho < float(self.__publishParam): # attacker publishes all blocks in private chain with probability \rho
                 self.__selfishValidBlocks += self.__privateChain
                 self.__publicChain, self.__privateChain = 0, 0
+
 
     def actualize_results(self):
         '''
@@ -136,18 +139,19 @@ class Selfish_Mining:
             'Revenue ratio = PoolBlocks / TotalBlocks : ' + str(self.__revenue) + '%\n'
         return simulation_message + current_stats + choosen_parameters + selfish_vs_honests_stats
 
-if len(sys.argv)==4:
-    dico = {'nb_simulations':int(sys.argv[1]), 'alpha':float(sys.argv[2]), 'gamma':float(sys.argv[3])}
-    new = Selfish_Mining(**dico)
-    new.Simulate()
+# if len(sys.argv)==4:
+#     dico = {'nb_simulations':int(sys.argv[1]), 'alpha':float(sys.argv[2]), 'gamma':float(sys.argv[3])}
+#     new = Hybrid_Selfish_Mining(**dico)
+#     new.Simulate()
 
 if len(sys.argv) == 1:
 
     start = time.time()
-    alphas = list(i / 100 for i in range(0, 50, 1))  # 50 => 0, 0.50, 0.01
+    alphas = list(i / 100 for i in range(0, 50, 1))  # attacker's mining power => from 0 to 0.49, step 0.01
     count = 0  # percentage done
+    # run 200,000 rounds for each alpha
     for alpha in alphas:
-        new = Selfish_Mining(**{'nb_simulations': 200000, 'alpha': alpha, 'gamma': 0.5, 'rho':1.0})
+        new = Hybrid_Selfish_Mining(**{'nb_simulations': 200000, 'alpha': alpha, 'gamma': 0.5, 'rho':0.5})
         new.Simulate()
         new.write_file()
         count += 1 / len(alphas)
